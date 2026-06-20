@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Your Shopping Cart{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 2rem;">
+    <h1 style="margin-bottom: 2rem;">Your Shopping Cart</h1>
+    
+    <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse: collapse; margin-bottom: 2rem;">
+            <thead>
+                <tr style="border-bottom:2px solid var(--border-color); text-align:left;">
+                    <th style="padding:1rem;">Product</th>
+                    <th style="padding:1rem;">Quantity</th>
+                    <th style="padding:1rem;">Remove</th>
+                    <th style="padding:1rem;">Unit Price</th>
+                    <th style="padding:1rem;">Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart %}
+                {% with product=item.product %}
+                <tr style="border-bottom:1px solid var(--border-color);">
+                    <td style="padding:1rem;">
+                        <a href="{{ product.get_absolute_url }}" style="font-weight:600; color:var(--text-main);">{{ product.name }}</a>
+                    </td>
+                    <td style="padding:1rem;">
+                        <form action="{% url 'cart:cart_add' product.id %}" method="post" style="display:flex; gap:0.5rem; align-items:center;">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="20" style="width:60px; padding:0.25rem; border-radius:4px; border:1px solid var(--border-color); background:rgba(0,0,0,0.2); color:white;">
+                            <input type="hidden" name="override" value="True">
+                            <button type="submit" class="btn btn-primary" style="padding:0.25rem 0.5rem; font-size:0.8rem;">Update</button>
+                        </form>
+                    </td>
+                    <td style="padding:1rem;">
+                        <form action="{% url 'cart:cart_remove' product.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="padding:0.25rem 0.5rem; font-size:0.8rem;">Remove</button>
+                        </form>
+                    </td>
+                    <td style="padding:1rem;">₹{{ item.price }}</td>
+                    <td style="padding:1rem; font-weight:700;">₹{{ item.total_price }}</td>
+                </tr>
+                {% endwith %}
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="padding:3rem; text-align:center; color:var(--text-muted);">
+                        Your cart is empty. <br><br><a href="{% url 'shop:product_list' %}" class="btn btn-primary">Continue Shopping</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                {% if cart|length > 0 %}
+                <tr style="background:rgba(255,255,255,0.02)">
+                    <td colspan="4" style="padding:1.5rem; text-align:right; font-weight:700; font-size:1.2rem;">Cart Total</td>
+                    <td style="padding:1.5rem; font-weight:700; font-size:1.2rem; color:var(--accent);">₹{{ cart.get_total_price }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="display:flex; justify-content:flex-end; gap:1rem;">
+        <a href="{% url 'shop:product_list' %}" class="btn" style="background:rgba(255,255,255,0.1); border:1px solid var(--border-color); color:var(--text-main);">Continue Shopping</a>
+        {% if cart|length > 0 %}
+        <!-- We will put '#' until orders app is ready to prevent URL NoReverseMatch -->
+        <a href="{% url 'orders:order_create' %}" class="btn btn-primary">Checkout</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

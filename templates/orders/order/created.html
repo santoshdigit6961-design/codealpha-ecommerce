@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You{% endblock %}
+
+{% block content %}
+<div class="auth-container glass-panel" style="text-align:center;">
+    <h2 style="color:var(--success); font-size:2rem; margin-bottom:1rem;">Order Successful</h2>
+    <p>Thank you for shopping at Aura.</p>
+    <p style="margin: 1.5rem 0; font-size:1.1rem;">Your order number is <strong style="color:var(--accent);">#{{ order.id }}</strong>.</p>
+    <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Continue Shopping</a>
+</div>
+{% endblock %}
